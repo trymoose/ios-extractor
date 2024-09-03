@@ -1,19 +1,20 @@
 package main
 
 import (
-	"log/slog"
-	"os"
+    "github.com/trymoose/errors"
+    "log/slog"
+    "os"
 )
 
 func main() {
-	Must(os.MkdirAll(Args().OutputDir, os.ModePerm))
-	success, defr := OnFail(func() {
-		slog.Error("failed to extract backup", slog.Bool("allow-partial", Args().AllowPartial))
-		if !Args().AllowPartial {
-			Must(os.RemoveAll(Args().OutputDir))
-		}
-	})
-	defer defr()
-	ExtractAllFiles()
-	success()
+    errors.Check(os.MkdirAll(Args().OutputDir, os.ModePerm))
+    success, defr := errors.OnFail(func() {
+        slog.Error("failed to extract backup", slog.Bool("allow-partial", Args().AllowPartial))
+        if !Args().AllowPartial {
+            errors.Check(os.RemoveAll(Args().OutputDir))
+        }
+    })
+    defer defr()
+    ExtractAllFiles()
+    success()
 }
